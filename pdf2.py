@@ -176,7 +176,6 @@ if uploaded_file is not None:
 
                 for _ in range(3):
                     description = get_image_description(openai, uploaded_file.getbuffer(),  system_prompt=system_prompt, user_prompt=user_prompt, is_image_type=True)
-                    
                     descriptions.append(description)
 
                 st.write(descriptions)
