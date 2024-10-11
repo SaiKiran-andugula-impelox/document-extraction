@@ -5,12 +5,21 @@ import openai
 from openai import OpenAI
 import json
 import fitz 
+
+
+
 from pdf2image import convert_from_bytes
+import os  # For accessing environment variables
+from dotenv import load_dotenv  # For loading the .env file
+
+
 
 from utils import get_image_description
 from confidence import get_confidence_level
-import os  # For accessing environment variables
-from dotenv import load_dotenv  # For loading the .env file
+from pdf_text_extraction import pdf_text
+
+
+
 
 # Load the environment variables from the .env file
 load_dotenv()
@@ -36,9 +45,8 @@ system_prompt = (
 )
 
 # Streamlit app layout
-st.title("PDF/Image Analysis Tool")
+st.title("Document extraction..")
 
-# Image Analysis Section
 st.write("Upload an image or PDF and get a description using GPT-4o.")
 
 # Textbox for updating the prompt
@@ -48,14 +56,6 @@ user_prompt = st.text_input("Enter the prompt for image description", "What’s 
 uploaded_file = st.file_uploader("Choose an image or PDF...", type=["jpg", "jpeg", "png", "pdf"])
 
 # Function to extract text from PDF using PyMuPDF (fitz)
-def extract_pdf_text(uploaded_file):
-    """Extract text from a PDF file using PyMuPDF and return it as a list."""
-    text_descriptions = []  # Store text descriptions for all pages
-    with fitz.open(stream=uploaded_file.read(), filetype="pdf") as doc:
-        for page in doc:
-            text = page.get_text()
-            text_descriptions.append(text)  # Collect text for each page
-    return ', '.join(text_descriptions)
 
 # Function to check if the PDF contains images using PyMuPDF and pdf2image
 def has_images_in_pdf(uploaded_file):
@@ -134,7 +134,7 @@ if uploaded_file is not None:
             st.write("No images found in the PDF or no valid images. Extracting text...")
 
             # Extract text from PDF and collect all pages into a list
-            pdf_text_descriptions = extract_pdf_text(uploaded_file)
+            pdf_text_descriptions = pdf_text(uploaded_file)
 
             if pdf_text_descriptions:  # Check if there are any extracted texts
                 st.write("Extracting text from the PDF:")
